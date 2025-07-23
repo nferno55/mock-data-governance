@@ -7,6 +7,9 @@ import os
 # Connect to SQLite database
 conn = sqlite3.connect("mock_data.db")
 
+# list of possible duplicate fields
+all_values = ("first_name", "last_name", "email", "account", "phone_number")
+
 # Create a list of queries that will run automatically and output their results into CSV files
 # List of queries to run
 queries = (
@@ -20,24 +23,13 @@ queries = (
 )
 
 # looking for NULL values
-for query in queries:
-    print(f"Running current query; {query}")
+for text in all_values:
+    query = f"SELECT * FROM mock_data WHERE {text} IS NULL;"
     # Read into a DataFrame
     df = pd.read_sql_query(query, conn)
 
-    # Extract condition from WHERE clause for filename
-    match = re.search(r'WHERE\s+(.+?);?$', query, re.IGNORECASE)
-    if match:
-        condition = match.group(1)
-        filename_part = re.sub(r'\W+', '_', condition.strip().lower())  # sanitize
-    else:
-        filename_part = f"query_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-
-    filename = f"{filename_part}.csv"
-
-    # Save to CSV
-    df.to_csv(filename, index=False)
-    print(f"Exported to {filename}\n")
+    df.to_csv(f"null_{text}.csv", index=False)
+    print(f"Exported null check for {text}")
 
 # list of possible duplicate fields
 values = ("first_name", "last_name", "email", "account", "phone_number")
@@ -53,3 +45,5 @@ for column in values:
     df = pd.read_sql_query(query, conn)
     df.to_csv(f"duplicate_{column}.csv", index=False)
     print(f"Exported duplicate check for {column}")
+
+# check for incorrect data
