@@ -4,8 +4,15 @@ import re
 import os
 from datetime import datetime
 
+# Define output folder name
+output_dir = "output"
+# Create the folder if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+# variable to store the database inside - allows for easy transfer to new database if it contains the same fields
+db_name = "mock_data.db"
+database = db_name.replace('.db', '')
 # Connect to SQLite database
-conn = sqlite3.connect("mock_data.db")
+conn = sqlite3.connect(db_name)
 # list of all fields
 all_values = ("first_name", "last_name", "email", "gender", "account", "phone_number", "date_created")
 # list of possible duplicate fields
@@ -24,7 +31,8 @@ def log_no_issues(message):
 
 # function to compile all the contents of no_issues into a simple txt file for review
 def write_summary_log(filename="dq_summary_log.txt"):
-    with open(filename, "w") as log:
+    full_path = os.path.join(output_dir, filename)
+    with open(full_path, "w") as log:
         log.write("DATA QUALITY CHECK SUMMARY\n")
         log.write("=" * 40 + "\n")
         if no_issues:
@@ -41,7 +49,9 @@ def run_query_and_export(query: str, filename: str, conn: sqlite3.Connection):
     df = pd.read_sql_query(query, conn)
     if not df.empty:
         # creates a csv file with the relevant query for review
-        df.to_csv(filename, index=False)
+        # Save CSV inside output folder
+        full_path = os.path.join(output_dir, filename)
+        df.to_csv(full_path, index=False)
         print(f"Exported: {filename}")
     else:
         # call the function instead of directly writing to the list
@@ -50,14 +60,14 @@ def run_query_and_export(query: str, filename: str, conn: sqlite3.Connection):
 
 # NULL value checks
 for field in all_values:
-    query = f"SELECT * FROM mock_data WHERE {field} IS NULL;"
+    query = f"SELECT * FROM {database} WHERE {field} IS NULL;"
     run_query_and_export(query, f"null_{field}.csv", conn)
 
 # Duplicate checks
 for field in values:
     query = f"""
         SELECT {field}, COUNT(*) as count
-        FROM mock_data
+        FROM {database}
         WHERE {field} IS NOT NULL
         GROUP BY {field}
         HAVING count > 1;
@@ -65,17 +75,17 @@ for field in values:
     run_query_and_export(query, f"duplicate_{field}.csv", conn)
 
 # Invalid email format
-invalid_email_query = "SELECT * FROM mock_data WHERE email IS NOT NULL AND email NOT LIKE '%_@__%.__%';"
+invalid_email_query = f"SELECT * FROM {database} WHERE email IS NOT NULL AND email NOT LIKE '%_@__%.__%';"
 run_query_and_export(invalid_email_query, "invalid_email.csv", conn)
 
 # Invalid phone numbers
-invalid_phone_query = "SELECT * FROM mock_data WHERE phone_number IS NOT NULL AND LENGTH(phone_number) != 10;"
+invalid_phone_query = f"SELECT * FROM {database} WHERE phone_number IS NOT NULL AND LENGTH(phone_number) != 10;"
 run_query_and_export(invalid_phone_query, "invalid_phone.csv", conn)
 
 # Future dates
-future_date_query = """
+future_date_query = f"""
     SELECT *
-    FROM mock_data
+    FROM {database}
     WHERE DATE(substr(date_created, 7, 4) || '-' || substr(date_created, 1, 2) || '-' || substr(date_created, 4, 2))
      > DATE('now');
 """
