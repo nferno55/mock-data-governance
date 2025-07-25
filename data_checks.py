@@ -52,7 +52,7 @@ def run_query_and_export(query: str, filename: str, conn: sqlite3.Connection):
         # Save CSV inside output folder
         full_path = os.path.join(output_dir, filename)
         df.to_csv(full_path, index=False)
-        print(f"Exported: {filename}")
+        print(f"Exported: {full_path}")
     else:
         # call the function instead of directly writing to the list
         log_no_issues(f"No results found for: {filename}")
