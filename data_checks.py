@@ -13,19 +13,39 @@ values = ("first_name", "last_name", "email", "account", "phone_number")
 # used to store all values where there are no issues so we do not print out blank JSON files
 no_issues = []
 
+# ensuring the no_issues list is clear, especially if the script gets run multiple times
+no_issues.clear()  # ensure list starts empty
+
+
+# adds results from queries that are good - ie no duplicates, nulls, or missing values
+def log_no_issues(message):
+    no_issues.append(message)
+
+
+# function to compile all the contents of no_issues into a simple txt file for review
+def write_summary_log(filename="dq_summary_log.txt"):
+    with open(filename, "w") as log:
+        log.write("DATA QUALITY CHECK SUMMARY\n")
+        log.write("=" * 40 + "\n")
+        if no_issues:
+            for line in no_issues:
+                log.write(line + "\n")
+        else:
+            log.write("All checks passed. No issues found.\n")
+    no_issues.clear()  # Clear after writing, ready for next run
+
 
 # check for incorrect data, utilizing a single function that can handle multiple types of queries
 def run_query_and_export(query: str, filename: str, conn: sqlite3.Connection):
-    """
-    Runs the SQL query, writes the result to a CSV file if rows are returned.
-    """
+    # Runs the SQL query, writes the result to a CSV file if rows are returned.
     df = pd.read_sql_query(query, conn)
     if not df.empty:
+        # creates a csv file with the relevant query for review
         df.to_csv(filename, index=False)
         print(f"Exported: {filename}")
     else:
-        # print(f"No rows found for: {filename}")
-        no_issues.append(f"No results found for: {filename}")
+        # call the function instead of directly writing to the list
+        log_no_issues(f"No results found for: {filename}")
 
 
 # NULL value checks
@@ -61,11 +81,7 @@ future_date_query = """
 """
 run_query_and_export(future_date_query, "future_date.csv", conn)
 
-with open("dq_summary_log.txt", "w") as log:
-    log.write("DATA QUALITY CHECK SUMMARY\n")
-    log.write("=" * 40 + "\n")
-    if no_issues:
-        for line in no_issues:
-            log.write(line + "\n")
-    else:
-        log.write("All checks passed. No issues found.\n")
+write_summary_log()
+
+# if __name__ == "__main__":
+#     main()
