@@ -1,4 +1,3 @@
-import datetime
 import sqlite3
 import pandas as pd
 import re
@@ -54,7 +53,12 @@ invalid_phone_query = "SELECT * FROM mock_data WHERE phone_number IS NOT NULL AN
 run_query_and_export(invalid_phone_query, "invalid_phone.csv", conn)
 
 # Future dates
-future_date_query = "SELECT * FROM mock_data WHERE date_created > DATE('now');"
+future_date_query = """
+    SELECT *
+    FROM mock_data
+    WHERE DATE(substr(date_created, 7, 4) || '-' || substr(date_created, 1, 2) || '-' || substr(date_created, 4, 2))
+     > DATE('now');
+"""
 run_query_and_export(future_date_query, "future_date.csv", conn)
 
 with open("dq_summary_log.txt", "w") as log:

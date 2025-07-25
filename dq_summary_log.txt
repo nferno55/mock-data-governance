@@ -4,4 +4,3 @@ No results found for: null_last_name.csv
 No results found for: null_gender.csv
 No results found for: null_account.csv
 No results found for: duplicate_phone_number.csv
-No results found for: future_date.csv
