@@ -83,6 +83,8 @@ invalid_phone_query = f"SELECT * FROM {database} WHERE phone_number IS NOT NULL 
 run_query_and_export(invalid_phone_query, "invalid_phone.csv", conn)
 
 # Future dates
+# substr changes mm/dd/yyyy into a format that Date('now') can use - yyyy/mm/dd; first value determines starting position
+# and second determines the length of the value to use
 future_date_query = f"""
     SELECT *
     FROM {database}
