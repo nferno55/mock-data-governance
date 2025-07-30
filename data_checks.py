@@ -8,7 +8,7 @@ from datetime import datetime
 output_dir = "output"
 # Create the folder if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
-# variable to store the database inside - allows for easy transfer to new database if it contains the same fields
+# variable to store the database inside - allows for easy transfer to new database with minimal changes to code
 db_name = "mock_data.db"
 database = db_name.replace('.db', '')
 # Connect to SQLite database
@@ -17,17 +17,19 @@ conn = sqlite3.connect(db_name)
 all_values = ("first_name", "last_name", "email", "gender", "account", "phone_number", "date_created")
 # list of possible duplicate fields
 values = ("first_name", "last_name", "email", "account", "phone_number")
-# used to store all values where there are no issues so we do not print out blank JSON files
+# used to store all values where there are no issues, so we do not print out blank CSV files
 no_issues = []
 
 # ensuring the no_issues list is clear, especially if the script gets run multiple times
-no_issues.clear()  # ensure list starts empty
+no_issues.clear()  # ensure list starts empty regardless of how many consecutive times the script is ran
 
 
 # adds results from queries that are good - ie no duplicates, nulls, or missing values
 def log_no_issues(message):
     no_issues.append(message)
 
+
+# TODO: add functions to correct issues after finding them, utilizing ETL and CI/CD methodologies
 
 # function to compile all the contents of no_issues into a simple txt file for review
 def write_summary_log(filename="dq_summary_log.txt"):
@@ -83,8 +85,8 @@ invalid_phone_query = f"SELECT * FROM {database} WHERE phone_number IS NOT NULL 
 run_query_and_export(invalid_phone_query, "invalid_phone.csv", conn)
 
 # Future dates
-# substr changes mm/dd/yyyy into a format that Date('now') can use - yyyy/mm/dd; first value determines starting position
-# and second determines the length of the value to use
+# substr changes mm/dd/yyyy into a format that Date('now') can use - yyyy/mm/dd; first value
+# determines starting position and second determines the length of the value to use
 future_date_query = f"""
     SELECT *
     FROM {database}
