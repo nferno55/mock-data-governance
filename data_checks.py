@@ -13,6 +13,8 @@ db_name = "mock_data.db"
 database = db_name.replace('.db', '')
 # Connect to SQLite database
 conn = sqlite3.connect(db_name)
+# total_entries will be used to determine the % of incorrect data
+total_entries: int
 # list of all fields
 all_values = ("first_name", "last_name", "email", "gender", "account", "phone_number", "date_created")
 # list of possible duplicate fields
@@ -26,13 +28,14 @@ no_issues.clear()  # ensure list starts empty regardless of how many consecutive
 
 # adds results from queries that are good - ie no duplicates, nulls, or missing values
 def log_no_issues(message):
-    # simple 
+    # simple
     no_issues.append(message)
 
 
 # TODO: add functions to correct issues after finding them, utilizing ETL and CI/CD methodologies
 
 # function to compile all the contents of no_issues into a simple txt file for review
+# forcing the filename for now, later iterations may change this
 def write_summary_log(filename="dq_summary_log.txt"):
     full_path = os.path.join(output_dir, filename)
     # using  w for now; we do not care about appending and keeping the data from previous runs right now
@@ -40,6 +43,7 @@ def write_summary_log(filename="dq_summary_log.txt"):
     with open(full_path, "w") as log:
         log.write("DATA QUALITY CHECK SUMMARY\n")
         log.write("=" * 40 + "\n")
+        log.write(f"Total entries inside current database: {total_entries}" + "\n")
         if no_issues:
             for line in no_issues:
                 # we do not need to use writelines since we are looping through each element of no_issues with /n
@@ -66,6 +70,12 @@ def run_query_and_export(query: str, filename: str, conn: sqlite3.Connection):
         log_no_issues(f"No results found for: {filename}")
 
 
+# quick check to get the total number of entries in the database
+length_query = f"SELECT COUNT(*) FROM {database}"
+database_len = conn.execute(length_query)
+total_entries = database_len.fetchone()[0]
+print(f"total entries in the database: {total_entries}")
+
 # NULL value checks - runs through all possible fields looking for null values
 for field in all_values:
     query = f"SELECT * FROM {database} WHERE {field} IS NULL;"
@@ -87,8 +97,9 @@ invalid_email_query = f"SELECT * FROM {database} WHERE email IS NOT NULL AND ema
 run_query_and_export(invalid_email_query, "invalid_email.csv", conn)
 
 # Invalid phone numbers - they must include the area code, but not the 1 in front of it
+# phone_number was created as a TEXT field, so we need to change the check to 12 - 10 for the number and 2 for the -'s
 # This will also flag numbers that DO include the 1, but an exception can be made to those at a later date if needed
-invalid_phone_query = f"SELECT * FROM {database} WHERE phone_number IS NOT NULL AND LENGTH(phone_number) != 10;"
+invalid_phone_query = f"SELECT * FROM {database} WHERE phone_number IS NOT NULL AND LENGTH(phone_number) != 12;"
 run_query_and_export(invalid_phone_query, "invalid_phone.csv", conn)
 
 # Future dates
