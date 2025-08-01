@@ -59,6 +59,7 @@ def write_summary_log(filename="dq_summary_log.txt"):
 def run_query_and_export(query: str, filename: str, conn: sqlite3.Connection):
     # Runs the SQL query, writes the result to a CSV file if rows are returned.
     df = pd.read_sql_query(query, conn)
+    # simple check to make sure we actually pulled a query into the df
     if not df.empty:
         # creates a csv file with the relevant query for review
         # Save CSV inside output folder
