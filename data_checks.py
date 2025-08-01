@@ -17,7 +17,7 @@ conn = sqlite3.connect(db_name)
 total_entries: int
 # list of all fields
 all_values = ("first_name", "last_name", "email", "gender", "account", "phone_number", "date_created")
-# list of possible duplicate fields
+# list of possible duplicate fields; some would not be used with real-world data obviously
 values = ("first_name", "last_name", "email", "account", "phone_number")
 # used to store all values where there are no issues, so we do not print out blank CSV files
 no_issues = []
