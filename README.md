@@ -21,4 +21,5 @@ working with messy data and using data quality practices to clean it up and prac
 
 8/1 - simple cleanup of script; fixed some of the comments to make them easier to remember what and why it was done
 
-
+8/7 - looking into YAML as a way to enfore Metadata rules
+  will create a new script that checks all fields against this metadata to ensure compliance
