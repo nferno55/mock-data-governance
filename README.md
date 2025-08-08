@@ -1,7 +1,7 @@
 # mock-data-governance
 working with messy data and using data quality practices to clean it up and practice SQL/Python automation
-##Future plans - utilize YAML to create metadata rules that define each field to ensure compliance
 
+# ##Future plans - utilize YAML to create metadata rules that define each field to ensure compliance
     **include a requirements.txt file showing all Python libraries used so others can run:
             pip install -r requirements.txt
     **automate fixing some issues other than creating csv files showing the issues
