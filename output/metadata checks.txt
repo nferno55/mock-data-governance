@@ -1,0 +1,6 @@
+METADATA ISSUES FOUND
+========================================
+Field '[[] first_name]' is missing required values.
+Field '[[] account]' must be unique.
+Field '[[] phone_number]' Phone number format is invalid.
+Field '[[] date_created]' is missing required values.

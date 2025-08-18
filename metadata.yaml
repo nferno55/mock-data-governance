@@ -6,43 +6,43 @@ spec:
   fields:
     - name: id
       data_type: integer
-      required: true
-      unique: true
+      required: True
+      unique: True
       description: ID unique to each customer
 
     - name: first_name
       data_type: string
-      required: true
+      required: True
       max_length: 50
       description: Customer's first name
 
     - name: last_name
       data_type: string
-      required: true
+      required: True
       max_length: 50
       description: Customer's last name
 
     - name: gender
       data_type: string
-      required: false
+      required: False
       allowed_values: [M, Male, F, Female, Non-Binary, Prefer Not to Say]
       description: Gender identification
 
     - name: account
       data_type: string
-      required: true
-      unique: true
+      required: True
+      unique: True
       description: Unique account number for each customer
 
     - name: phone_number
       data_type: string # current field is TEXT, meaning we need to parse any -'s added
-      required: false
+      required: False
       format: phone # we are looking for 10 values, excluding the dashes and 1+
       description: Customer's phone number
 
     - name: date_created
       data_type: string # current field is TEXT
-      required: true
+      required: True
       format: MM-DD-YYYY # we will need to modify this in the code
       description: Date the account was created
 
