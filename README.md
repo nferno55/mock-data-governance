@@ -29,3 +29,6 @@ working with messy data and using data quality practices to clean it up and prac
 
 8/7 - looking into YAML as a way to enfore Metadata rules
   will create a new script that checks all fields against this metadata to ensure compliance
+
+8/18 - added a YAML metadata file, and created a python script to loop through it and check for issues
+  still not 100% correct on the code, but getting there
